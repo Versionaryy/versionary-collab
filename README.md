@@ -1,2 +1,2 @@
-# versionary-media
+# Versionary Media
 Rede social do jogo Versionary
