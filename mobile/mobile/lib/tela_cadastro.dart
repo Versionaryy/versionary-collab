@@ -1,29 +1,13 @@
 import 'package:flutter/material.dart';
-import 'tela_cadastro.dart'; // importe a página de cadastro
 
-void main() => runApp(VersionaryLogin());
-
-class VersionaryLogin extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginPage(),
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/cadastro': (context) => CadastroPage(),
-      },
-    );
-  }
-}
-
-class LoginPage extends StatelessWidget {
+class CadastroPage extends StatelessWidget {
   final Color roxo = const Color(0xFF7C3389);
-  final Color fundoLogin = const Color(0xFFCFB4D3);
+  final Color fundoCadastro = const Color(0xFFCFB4D3);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -55,36 +39,44 @@ class LoginPage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
-            // Card de login
+            // Card de cadastro
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: fundoLogin,
+                color: fundoCadastro,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Login',
+                    'Criar conta',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: roxo,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Faça login com seu email',
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
 
                   TextField(
                     decoration: InputDecoration(
-                      hintText: 'Email',
+                      hintText: 'Usuário',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'E-mail',
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -107,17 +99,20 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-
-                  Text(
-                    'Esqueceu sua senha?',
-                    style: TextStyle(
-                      color: roxo,
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
                   const SizedBox(height: 16),
+
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Data de nascimento',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
                   ElevatedButton(
                     onPressed: () {},
@@ -129,7 +124,7 @@ class LoginPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: const Text(
-                      'Entrar',
+                      'Criar',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white,
@@ -137,20 +132,6 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/cadastro');
-              },
-              child: Text(
-                'Criar conta',
-                style: TextStyle(
-                  color: roxo,
-                  decoration: TextDecoration.underline,
-                ),
               ),
             ),
           ],
