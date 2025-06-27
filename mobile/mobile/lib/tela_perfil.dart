@@ -9,9 +9,9 @@ class TelaPerfil extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          const SizedBox(height: 40),
-          Image.asset('assets/logo.png', height: 40),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
+          Image.asset('assets/logo.png', height: 80),
+          const SizedBox(height: 10),
           const CircleAvatar(
             radius: 40,
             backgroundColor: roxo,
@@ -46,7 +46,10 @@ class TelaPerfil extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             ),
-            child: const Text('SALVAR'),
+            child: const Text(
+              'SALVAR',
+              style: TextStyle(color: Colors.white)
+            ),
           ),
           const SizedBox(height: 12),
           OutlinedButton(
@@ -78,7 +81,10 @@ class TelaPerfil extends StatelessWidget {
         onPressed: () {
           // botão "+"
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );

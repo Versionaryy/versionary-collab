@@ -10,9 +10,10 @@ class TelaFeed extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        toolbarHeight: 75,
         title: Image.asset(
           'assets/logo.png',
-          height: 40,
+          height: 80,
         ),
         centerTitle: true,
         actions: [
@@ -27,9 +28,9 @@ class TelaFeed extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          postCard(context, 'valentina.prado', 'Como faço para resolver o puzzle da fase 2?'),
-          postCard(context, 'fernanda.lopes', 'Preciso de ajuda na resolução do puzzle do labirinto!'),
-          postCard(context, 'duda.melim', 'Qual técnica de git devo usar para resolver o puzzle da fase 6?'),
+          postCard(context, 'valentina.prado', 'Como faço para resolver o puzzle da fase 2?', postId: 'post1'),
+          postCard(context, 'fernanda.lopes', 'Preciso de ajuda na resolução do puzzle do labirinto!', postId: 'post2'),
+          postCard(context, 'duda.melim', 'Qual técnica de git devo usar para resolver o puzzle da fase 6?', postId: 'post3'),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
@@ -56,13 +57,16 @@ class TelaFeed extends StatelessWidget {
         onPressed: () {
           Navigator.pushNamed(context, '/criarpost');
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add, 
+          color: Colors.white,
+          ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  Widget postCard(BuildContext context, String username, String content) {
+  Widget postCard(BuildContext context, String username, String content, {required String postId}) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -95,7 +99,27 @@ class TelaFeed extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
-                const Icon(Icons.more_vert),
+                PopupMenuButton<String>(
+                  onSelected: (String value) {
+                    if (value == 'editar') {
+                      print('Editar post: $postId');
+                    } else if (value == 'apagar') {
+                      print('Apagar post: $postId');
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'editar',
+                      child: Text('Editar'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'apagar',
+                      child: Text('Apagar'),
+                    ),
+                  ],
+                  icon: const Icon(Icons.more_vert),
+                  tooltip: '',
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -129,13 +153,14 @@ class TelaFeed extends StatelessWidget {
                         'username': username,
                         'conteudo': content,
                         'tag': 'Dúvida',
+                        'postId': '',
                       },
                     );
                   },
                   child: const Text('Comentar'),
                 ),
-                const Spacer(),
-                const Icon(Icons.share, size: 18),
+                //const Spacer(),
+                //const Icon(Icons.share, size: 18),
               ],
             )
           ],

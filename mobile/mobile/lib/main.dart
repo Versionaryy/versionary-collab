@@ -30,6 +30,7 @@ class VersionaryApp extends StatelessWidget {
               username: args['username']!,
               conteudo: args['conteudo']!,
               tag: args['tag']!,
+              postId: args['postId']!,
             ),
           );
         }
@@ -50,14 +51,10 @@ class LoginPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 60),
+            const SizedBox(height: 30),
             Column(
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/logo.png'),
-                  backgroundColor: Colors.black,
-                ),
+                Image.asset('assets/logo.png', height: 160),
                 const SizedBox(height: 10),
                 Text(
                   'Versionary',
