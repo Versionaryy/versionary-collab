@@ -8,7 +8,7 @@ class TelaNotificacoes extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: roxo,
-        title: const Text('Notificações'),
+        title: const Text('Notificações', style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
       body: ListView(

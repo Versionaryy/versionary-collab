@@ -11,15 +11,11 @@ class CadastroPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 60),
+            const SizedBox(height: 10),
             Column(
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/logo.png'),
-                  backgroundColor: Colors.black,
-                ),
-                const SizedBox(height: 10),
+                Image.asset('assets/logo.png', height: 160),
+                const SizedBox(height: 0),
                 Text(
                   'Versionary',
                   style: TextStyle(
@@ -37,7 +33,7 @@ class CadastroPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
 
             // cadastro
             Container(
