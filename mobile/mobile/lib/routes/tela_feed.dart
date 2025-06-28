@@ -1,10 +1,35 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class TelaFeed extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:mobile/models/post.dart';
+import 'package:mobile/services/data_class.dart';
+import 'package:provider/provider.dart';
+
+
+
+class TelaFeed extends StatefulWidget {
+
+  const TelaFeed({super.key});
+
+  @override
+  State<TelaFeed> createState() => _TelaFeedState();
+}
+
+class _TelaFeedState extends State<TelaFeed> {
+  @override
+  void initState() {
+    super.initState();
+  Future.microtask(() {
+    final posts = Provider.of<DataClass>(context, listen: false);
+    posts.getPosts();
+  });
+  }
+
   final Color roxo = const Color(0xFF7C3389);
 
   @override
   Widget build(BuildContext context) {
+    final posts = Provider.of<DataClass>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -25,13 +50,20 @@ class TelaFeed extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          postCard(context, 'valentina.prado', 'Como faço para resolver o puzzle da fase 2?', postId: 'post1'),
-          postCard(context, 'fernanda.lopes', 'Preciso de ajuda na resolução do puzzle do labirinto!', postId: 'post2'),
-          postCard(context, 'duda.melim', 'Qual técnica de git devo usar para resolver o puzzle da fase 6?', postId: 'post3'),
-        ],
+      body:  
+      posts.posts == null
+          ? const Center(child: CircularProgressIndicator())
+          : posts.posts!.isEmpty
+              ? const Center(child: Text('Nenhum post encontrado'))
+              :
+      ListView.builder(
+        itemBuilder: (context, index) {
+          final post = posts.posts?[index];
+          final username = 'Usuário';
+          final content = post?.titulo ?? '';
+          return postCard(context, username, content);
+        },
+        itemCount: posts.posts?.length ?? 0,
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -66,7 +98,7 @@ class TelaFeed extends StatelessWidget {
     );
   }
 
-  Widget postCard(BuildContext context, String username, String content, {required String postId}) {
+  Widget postCard(BuildContext context, String username, String content /*,{required String postId}*/) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -102,9 +134,9 @@ class TelaFeed extends StatelessWidget {
                 PopupMenuButton<String>(
                   onSelected: (String value) {
                     if (value == 'editar') {
-                      print('Editar post: $postId');
+                      print('Editar post: ');
                     } else if (value == 'apagar') {
-                      print('Apagar post: $postId');
+                      print('Apagar post:');
                     }
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -153,7 +185,7 @@ class TelaFeed extends StatelessWidget {
                         'username': username,
                         'conteudo': content,
                         'tag': 'Dúvida',
-                        'postId': '',
+                        // 'postId': '',
                       },
                     );
                   },

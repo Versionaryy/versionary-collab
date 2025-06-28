@@ -1,41 +1,48 @@
 import 'package:flutter/material.dart';
-import 'tela_cadastro.dart';
-import 'tela_feed.dart';
-import 'tela_criarpost.dart';
-import 'tela_comentarios.dart';
-import 'tela_perfil.dart';
-import 'tela_notificacoes.dart';
+import 'package:mobile/services/data_class.dart';
+import 'package:provider/provider.dart';
+import 'routes/tela_cadastro.dart';
+import 'routes/tela_feed.dart';
+import 'routes/tela_criarpost.dart';
+import 'routes/tela_comentarios.dart';
+import 'routes/tela_perfil.dart';
+import 'routes/tela_notificacoes.dart';
 
 void main() => runApp(VersionaryApp());
 
 class VersionaryApp extends StatelessWidget {
+  const VersionaryApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => LoginPage(),
-        '/cadastro': (context) => CadastroPage(),
-        '/feed': (context) => TelaFeed(),
-        '/criarpost': (context) => TelaCriarPost(),
-        '/perfil': (context) => TelaPerfil(),
-        '/notificacoes': (context) => TelaNotificacoes(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/comentarios') {
-          final args = settings.arguments as Map<String, String>;
-          return MaterialPageRoute(
-            builder: (context) => TelaComentarios(
-              username: args['username']!,
-              conteudo: args['conteudo']!,
-              tag: args['tag']!,
-              postId: args['postId']!,
-            ),
-          );
-        }
-        return null;
-      },
+    return ChangeNotifierProvider( 
+      create: (context) => DataClass(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/login',
+        routes: {
+          '/login': (context) => LoginPage(),
+          '/cadastro': (context) => CadastroPage(),
+          '/feed': (context) => TelaFeed(),
+          '/criarpost': (context) => TelaCriarPost(),
+          '/perfil': (context) => TelaPerfil(),
+          '/notificacoes': (context) => TelaNotificacoes(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == '/comentarios') {
+            final args = settings.arguments as Map<String, String>;
+            return MaterialPageRoute(
+              builder: (context) => TelaComentarios(
+                username: args['username']!,
+                conteudo: args['conteudo']!,
+                tag: args['tag']!,
+                postId: args['postId']!,
+              ),
+            );
+          }
+          return null;
+        },
+      ),
     );
   }
 }
@@ -43,6 +50,8 @@ class VersionaryApp extends StatelessWidget {
 class LoginPage extends StatelessWidget {
   final Color roxo = const Color(0xFF7C3389);
   final Color fundoLogin = const Color(0xFFCFB4D3);
+
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
