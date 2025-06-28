@@ -1,0 +1,31 @@
+services:
+  eureka-service:
+    env_file:
+      - ".env"
+    build:
+      context: ./eureka-service
+    ports:
+      - "8761:8761"
+    restart: unless-stopped
+
+
+  post-service:
+    env_file:
+      - ".env"
+    build:
+      context: ./post-service
+    ports:
+      - "8089:8089"
+    restart: unless-stopped
+    depends_on:
+      - eureka-service
+  user-service:
+    env_file:
+      - ".env"
+    build:
+      context: ./user-service
+    ports:
+      - "8003:8003"
+    restart: unless-stopped
+    depends_on:
+      - eureka-service
