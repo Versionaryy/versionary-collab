@@ -41,7 +41,7 @@ jobs:
           echo "Nova API Config: ${CONFIG_ID}"
           
           echo  "Criação da configuração em si"
-          gcloud config create ${CONFIG_ID} \
+          gcloud config configurations create ${CONFIG_ID} \
             --api=${{ secrets.API_ID }} \
             --openapi-spec=./api-gateway-config/openapi-spec.yml \
             --project=${{ secrets.GCP_PROJECT_ID }}
