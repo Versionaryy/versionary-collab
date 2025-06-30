@@ -36,7 +36,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: ${{ secrets.CREDENTIALS_JSON }}
-          service_account: ${{ secrets.GCP_SA_EMAIL }}
+          # service_account: ${{ secrets.GCP_SA_EMAIL }}
 
       - name: 'Buildx Docker'
         uses: docker/setup-buildx-action@v3
