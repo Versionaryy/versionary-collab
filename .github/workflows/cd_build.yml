@@ -40,15 +40,12 @@ jobs:
 
       - name: 'Buildx Docker'
         uses: docker/setup-buildx-action@v3
-      - name: 'Teste'
-        run: echo "${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}"
-
       - name: 'Build e push da imagem'
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.build-context }} 
           push: true
-          tags: ${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
+          tags: ${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
