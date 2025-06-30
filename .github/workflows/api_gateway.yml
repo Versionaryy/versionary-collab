@@ -1,0 +1,52 @@
+name: API Gateway Versionary Collab
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'api-gateway-config/**'
+  workflow_dispatch:
+
+env:
+  REGION: "us-east1"
+
+jobs:
+  deploy-gateway:
+    name: Deploy API Gateway Config
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+
+      - name: 'Autenticação'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: 'gcloud CLI para comandos'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 'Atualização do Gateway'
+        run: |
+          CONFIG_ID="${{ secrets.API_ID }}-config-${GITHUB_SHA::7}"
+
+          echo "Nova API Config: ${CONFIG_ID}"
+          
+          echo  "Criação da configuração em si"
+          gcloud api-configs create ${CONFIG_ID} \
+            --api=${{ secrets.API_ID }} \
+            --openapi-spec=./api-gateway-config/openapi-spec.yml \
+            --project=${{ secrets.GCP_PROJECT_ID }}
+
+          echo "Atualização do Gateway para implementar nova configuração"
+          gcloud api-gateways update ${{ secrets.GATEWAY_ID}} \
+            --api=${{ secrets.API_ID }} \
+            --api-config=${CONFIG_ID} \
+            --location=${REGION} \
+            --project=${{ secrets.GCP_PROJECT_ID }}
