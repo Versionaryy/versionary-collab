@@ -35,8 +35,7 @@ jobs:
       - name: 'Autenticação Google Cloud'
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_SA_EMAIL }}
+          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
 
       - name: 'Buildx Docker'
         uses: docker/setup-buildx-action@v3
