@@ -26,8 +26,8 @@ jobs:
       - name: 'Autenticação'
         uses: 'google-github-actions/auth@v2'
         with:
-          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
-          # service_account: ${{ secrets.GCP_SA_EMAIL }}
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
 
       - name: 'gcloud CLI para comandos'
         uses: 'google-github-actions/setup-gcloud@v2'
