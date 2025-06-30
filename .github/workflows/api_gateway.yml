@@ -18,11 +18,14 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-
     steps:
+      
       - name: 'Checkout'
         uses: actions/checkout@v4
-
+      - name: 'Debug Segredos'
+        run: |
+          echo "WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}"
+          echo "GCP_SA_EMAIL: ${{ secrets.GCP_SA_EMAIL }}"
       - name: 'Autenticação'
         uses: 'google-github-actions/auth@v2'
         with:
