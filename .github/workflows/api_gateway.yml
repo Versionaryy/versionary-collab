@@ -14,7 +14,7 @@ jobs:
   deploy-gateway:
     name: Deploy API Gateway Config
     runs-on: ubuntu-latest
-
+    environment: environment
     permissions:
       contents: 'read'
       id-token: 'write'

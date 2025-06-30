@@ -11,6 +11,7 @@ jobs:
   deploy-services:
     name: Deploy dos microsserviços
     runs-on: ubuntu-latest
+    environment: environment
     
     permissions:
       contents: 'read'
