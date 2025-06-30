@@ -2,7 +2,7 @@ name: Atualização microsserviços na GCP
 
 on:
   push:
-    branches: [ "main" ]
+    branch: "main"
 
 env:
   GAR_REPOSITORY: "versionary-collab" 
@@ -35,7 +35,7 @@ jobs:
       - name: 'Autenticação Google Cloud'
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
 
       - name: 'Buildx Docker'

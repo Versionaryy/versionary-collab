@@ -2,7 +2,7 @@ name: API Gateway Versionary Collab
 
 on:
   push:
-    branches: [ "main" ]
+    branch: "main"
     paths:
       - 'api-gateway-config/**'
   workflow_dispatch:
@@ -26,7 +26,7 @@ jobs:
       - name: 'Autenticação'
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
 
       - name: 'gcloud CLI para comandos'
