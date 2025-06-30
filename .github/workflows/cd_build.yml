@@ -1,0 +1,59 @@
+name: Atualização microsserviços na GCP
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  GAR_REPOSITORY: "versionary-collab" 
+
+jobs:
+  deploy-services:
+    name: Deploy dos microsserviços
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    strategy:
+      matrix:
+        service-name: [user-service, post-service]
+        # notification-service]
+        include:
+          - service-name: user-service
+            build-context: ./backend/user-service
+          - service-name: post-service
+            build-context: ./backend/post-service
+          # - service-name: notification-service
+          #   build-context: ./backend/notification-service
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: 'Autenticação Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: 'Buildx Docker'
+        uses: docker/setup-buildx-action@v3
+
+      - name: 'Build e push da imagem'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.build-context }} 
+          push: true
+          tags: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 'Deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: ${{ matrix.service-name }} 
+          region: ${{ env.GAR_LOCATION }} 
+          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
+          flags: '--allow-unauthenticated'
