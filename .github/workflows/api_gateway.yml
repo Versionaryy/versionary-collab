@@ -2,7 +2,7 @@ name: API Gateway Versionary Collab
 
 on:
   push:
-    branch: "main"
+    branches: [ "main" ]
     paths:
       - 'api-gateway-config/**'
   workflow_dispatch:
