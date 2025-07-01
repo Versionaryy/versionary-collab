@@ -43,8 +43,8 @@ jobs:
             # --openapi-spec=./api-gateway-config/openapi-spec.yml \
         
           echo "Atualização do Gateway para implementar nova configuração"
-          gcloud api-gateways gateway update ${{ secrets.GATEWAY_ID}} \
+          gcloud api-gateway gateways update ${{ secrets.GATEWAY_ID}} \
             --api=${{ secrets.API_ID }} \
             --api-config=${CONFIG_ID} \
-            --location=${REGION} \
+            --location=${{ var.REGION}} \
             --project=${{ secrets.GCP_PROJECT_ID }}
