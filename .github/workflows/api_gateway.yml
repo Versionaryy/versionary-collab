@@ -41,7 +41,7 @@ jobs:
             --api=${{ secrets.API_ID }} \
             --openapi-spec=./api-gateway-config/openapi-spec.yml \
             --project=${{ secrets.GCP_PROJECT_ID }} \
-            --location=${{ env.REGION }}
+           
 
             # --api=${{ secrets.API_ID }} \
             # --openapi-spec=./api-gateway-config/openapi-spec.yml \
