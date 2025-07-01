@@ -46,5 +46,5 @@ jobs:
           gcloud api-gateway gateways update ${{ secrets.GATEWAY_ID}} \
             --api=${{ secrets.API_ID }} \
             --api-config=${CONFIG_ID} \
-            --location=${{ var.REGION}} \
+            --location=${{env.REGION}} \
             --project=${{ secrets.GCP_PROJECT_ID }}
