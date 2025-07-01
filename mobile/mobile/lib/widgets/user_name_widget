@@ -1,0 +1,61 @@
+import 'package:flutter/material.dart';
+import 'package:mobile/main.dart';
+import 'package:mobile/models/user.dart';
+import 'package:mobile/services/service_class.dart';
+import 'package:provider/provider.dart';
+
+class UserNameWidget extends StatefulWidget {
+  final int userId;
+  final TextStyle? style;
+  final bool showOnlyInitial;
+
+  const UserNameWidget(
+      {super.key, required this.userId, this.style, this.showOnlyInitial = false});
+
+  @override
+  State<UserNameWidget> createState() => _UserNameWidgetState();
+}
+
+class _UserNameWidgetState extends State<UserNameWidget> {
+  Future<User>? _userFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final token = Provider.of<UserProvider>(context, listen: false).token;
+      if (token != null) {
+        setState(() {
+          _userFuture = fetchUser(widget.userId, token);
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<User>(
+      future: _userFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting && _userFuture != null) {
+          return Text('Carregando...', style: widget.style);
+        } else if (snapshot.hasError) {
+          return Text('Usuário ${widget.userId}', style: widget.style);
+        } else if (snapshot.hasData) {
+          final userName = snapshot.data!.nome;
+          final displayText = widget.showOnlyInitial && userName.isNotEmpty
+              ? userName[0].toUpperCase()
+              : userName;
+
+          return Text(
+            displayText,
+            style: widget.style ?? const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          );
+        } else {
+          return Text('Usuário ${widget.userId}', style: widget.style);
+        }
+      },
+    );
+  }
+}

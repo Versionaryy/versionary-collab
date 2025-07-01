@@ -61,7 +61,7 @@ class TelaPerfil extends StatelessWidget {
                 const SizedBox(height: 12),
                 OutlinedButton(
                   onPressed: () async{
-                    // sair
+              
                     await Provider.of<UserProvider>(context, listen: false).clearToken();
                     Navigator.of(context).pushNamedAndRemoveUntil("/login", (Route<dynamic> route) => false);
                   },
@@ -83,7 +83,7 @@ class TelaPerfil extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(icon: const Icon(Icons.home), onPressed: () => Navigator.pop(context)),
+            IconButton(icon: const Icon(Icons.home), onPressed: () =>      Navigator.pushNamed(context, '/feed')),
             IconButton(icon: const Icon(Icons.person), onPressed: () {}),
           ],
         ),

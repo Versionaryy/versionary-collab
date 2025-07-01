@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:mobile/models/post.dart';
-import 'package:mobile/models/postFeed.dart';
+import 'package:mobile/models/post_feed.dart';
 import 'package:mobile/services/data_class.dart';
+import 'package:mobile/widgets/user_name_widget';
+
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -97,7 +99,9 @@ Color _corTag(CategoriaPost categoria) {
           children: [
             IconButton(
               icon: const Icon(Icons.home),
-              onPressed: () {},
+              onPressed: () {
+                                Navigator.pop(context, '/feed');
+              },
             ),
             IconButton(
               icon: const Icon(Icons.person),
@@ -153,11 +157,7 @@ Color _corTag(CategoriaPost categoria) {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                      "${post.usuarioId}",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
+                      UserNameWidget(userId: post.usuarioId!),
                        Text("${post.atualizado_em?.toLocal()}",
                           style: TextStyle(fontSize: 12)),
                     ],
@@ -240,9 +240,8 @@ Color _corTag(CategoriaPost categoria) {
                         context,
                         '/comentarios',
                         arguments: {
-                          'username': post.usuarioId.toString(),
-                          'conteudo': post.titulo,
-                          'tag': 'Dúvida',
+                          'postId': post.id,
+                     
                           // 'postId': '',
                         },
                       );

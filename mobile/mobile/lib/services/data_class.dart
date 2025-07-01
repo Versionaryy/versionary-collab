@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/models/comment.dart';
 import 'package:mobile/models/post.dart';
 import 'package:mobile/models/post_create_dto.dart';
-import 'package:mobile/models/postFeed.dart';
+import 'package:mobile/models/post_feed.dart';
 import 'package:mobile/services/service_class.dart';
 
 class DataClass extends ChangeNotifier {
@@ -71,6 +72,17 @@ class DataClass extends ChangeNotifier {
     } catch (e) {
       print('Erro ao criar o post: $e');
       throw Exception('Falha ao criar o post.');
+    }
+  }
+
+  Future<void> addCommentToPost(Comment comentario) async {
+    _ensureAuthenticated();
+    try {
+      await createComment(comentario, _token!);
+      await getSpecificPost(comentario.post?.id ?? 0); 
+    } catch (e) {
+      print('Erro ao adicionar comentário: $e');
+      throw Exception('Falha ao adicionar comentário.');
     }
   }
 }

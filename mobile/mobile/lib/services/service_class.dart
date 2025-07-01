@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:mobile/models/comment.dart';
 import 'package:mobile/models/post.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/models/post_create_dto.dart';
-import 'package:mobile/models/postFeed.dart';
+import 'package:mobile/models/post_feed.dart';
+import 'package:mobile/models/user.dart';
 
 const String baseUrl = "http://localhost:8089";
 
@@ -15,6 +17,18 @@ Map<String, String> _getHeaders(String? token) {
     headers['Authorization'] = 'Bearer $token';
   }
   return headers;
+}
+
+Future<User> fetchUser(int id, String token) async {
+  final response = await http.get(
+    Uri.parse("$baseUrl/users/$id"),
+    headers: _getHeaders(token),
+  );
+  if (response.statusCode == 200) {
+    return User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  } else {
+    throw Exception('Falha ao carregar o usuário');
+  }
 }
 
 Future<List<PostFeed>> fetchPosts(String? token) async {
@@ -79,4 +93,18 @@ Future<void> createPost(PostCreateDto post, String token) async {
   if (response.statusCode != 201) {
     throw Exception('Falha ao criar o post: ${response.body}');
   }
+}
+
+Future<void> createComment(Comment comentario, String token) async {
+  final response = await http.post(
+    Uri.parse("$baseUrl/posts/${comentario.post?.id}/comments"),
+    headers: _getHeaders(token),
+    body: jsonEncode(comentario.toJson()),
+  );
+
+  if (response.statusCode != 201) {
+    throw Exception('Falha ao comentar no post: ${response.body}');
+  }
+ 
+  
 }
