@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:collection';
 import 'package:mobile/models/comment.dart';
-import 'package:mobile/models/like.dart';
+
 
 part 'post.g.dart';
 
@@ -22,7 +22,7 @@ class Post {
   Set<Comment>? comentarios = HashSet<Comment>();
   CategoriaPost? categoria;
 
-  Post(this.id, this.titulo, this.descricao, this.usuarioId, this.comentarios);
+  Post(this.id, this.titulo, this.descricao, this.usuarioId, this.comentarios, this.categoria);
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
   Map<String, dynamic> toJson() => _$PostToJson(this);
 }

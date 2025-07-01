@@ -37,7 +37,6 @@ class TelaPerfil extends StatelessWidget {
                   PerfilCampo(label: 'E-mail', hint: 'Alterar e-mail'),
                   PerfilCampo(label: 'Senha', hint: 'Alterar senha'),
                   PerfilCampo(label: 'Usuário', hint: 'Alterar usuário'),
-                  PerfilCampo(label: 'Data de nascimento', hint: 'Alterar data de nascimento'),
                 ],
               ),
             ),

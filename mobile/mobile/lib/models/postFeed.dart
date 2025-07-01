@@ -1,9 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:collection';
-import 'package:mobile/models/comment.dart';
-import 'package:mobile/models/like.dart';
 import 'package:mobile/models/post.dart';
-
 part 'postFeed.g.dart';
 
 

@@ -4,6 +4,8 @@ class CadastroPage extends StatelessWidget {
   final Color roxo = const Color(0xFF7C3389);
   final Color fundoCadastro = const Color(0xFFCFB4D3);
 
+  const CadastroPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,19 +97,7 @@ class CadastroPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
 
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Data de nascimento',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 24),
 
                   ElevatedButton(

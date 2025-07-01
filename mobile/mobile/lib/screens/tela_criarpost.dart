@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/post.dart';
+import 'package:mobile/models/post_create_dto.dart';
 import 'package:mobile/services/data_class.dart';
 import 'package:provider/provider.dart';
 
@@ -7,70 +8,128 @@ class TelaCriarPost extends StatefulWidget {
   const TelaCriarPost({super.key});
 
   @override
-  _TelaCriarPostState createState() => _TelaCriarPostState();
+  State<TelaCriarPost> createState() => _TelaCriarPostState();
 }
 
 class _TelaCriarPostState extends State<TelaCriarPost> {
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _conteudoController = TextEditingController();
 
-  Post? postParaEditar;
+  int? _editingPostId;
   bool _isEditing = false;
+  CategoriaPost _categoriaSelecionada = CategoriaPost.Duvida;
+
+  bool _isLoading = false; 
+  bool _isSaving = false; 
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments != null && arguments is int && _editingPostId == null) {
+      _editingPostId = arguments;
+      _isEditing = true;
+      _fetchPostDetails();
+    }
+  }
 
-    if (postParaEditar == null) {
-      final post = ModalRoute.of(context)?.settings.arguments as Post?;
-      if (post != null) {
-        setState(() {
-          postParaEditar = post;
-          _isEditing = true;
-          _tituloController.text = post.titulo ?? '';
-          _conteudoController.text = post.descricao ?? '';
-        });
+  Future<void> _fetchPostDetails() async {
+    setState(() => _isLoading = true);
+    try {
+      final dataProvider = Provider.of<DataClass>(context, listen: false);
+      await dataProvider.getSpecificPost(_editingPostId!);
+      final post = dataProvider.post;
+
+      if (post == null) {
+        // This should not happen if getSpecificPost succeeds, but it's a good safeguard.
+        throw Exception("Dados do post não encontrados após a busca.");
+      }
+
+      _tituloController.text = post.titulo ?? '';
+      _conteudoController.text = post.descricao ?? '';
+      _categoriaSelecionada = post.categoria ?? CategoriaPost.Duvida;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar post: $e')),
+        );
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
 
-  void _submitForm() async {
+  Future<void> _submitForm() async {
+    if (_tituloController.text.isEmpty || _conteudoController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Título e conteúdo não podem estar vazios.')),
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
     final provider = Provider.of<DataClass>(context, listen: false);
 
-    FocusScope.of(context).unfocus();
-
-    if (_isEditing) {
-      final updatedPost = Post(
-        postParaEditar!.id,
-        _tituloController.text,
-        _conteudoController.text,
-        postParaEditar!.usuarioId,
-        postParaEditar!.comentarios,
-      );
-
-      try {
-        await provider.editPost(postParaEditar!.id!, updatedPost);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Post atualizado com sucesso!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pop(context);
+    try {
+      if (_isEditing) {
+        final originalPost = provider.post;
+        if (originalPost == null) {
+          throw Exception(
+              "Não foi possível encontrar os dados do post para editar.");
         }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Erro ao atualizar o post.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+
+        final updatedPost = Post(
+          _editingPostId,
+          _tituloController.text,
+          _conteudoController.text,
+          originalPost.usuarioId,
+          originalPost.comentarios,
+          _categoriaSelecionada,
+        );
+        await provider.editPost(_editingPostId!, updatedPost);
+      } else {
+        final novoPost = PostCreateDto(
+          titulo: _tituloController.text,
+          descricao: _conteudoController.text,
+          categoria: _categoriaSelecionada,
+        );
+        await provider.createPostService(novoPost);
+      }
+
+      if (mounted) {
+        final message = _isEditing ? 'Post atualizado com sucesso!' : 'Post criado com sucesso!';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.green),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        final message = _isEditing ? 'Erro ao atualizar o post.' : 'Erro ao criar o post.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$message: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
       }
     }
+  }
+
+  Widget _tagButton(String label, CategoriaPost categoria) {
+    final isSelected = _categoriaSelecionada == categoria;
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? const Color(0xFF7C3389) : Colors.grey[200],
+        foregroundColor: isSelected ? Colors.white : Colors.black,
+      ),
+      onPressed: () => setState(() => _categoriaSelecionada = categoria),
+      child: Text(label),
+    );
   }
 
   @override
@@ -100,49 +159,59 @@ class _TelaCriarPostState extends State<TelaCriarPost> {
         ),
         centerTitle: true,
         actions: [
-          TextButton(
-            onPressed: _submitForm,
-            child: Text(
-              _isEditing ? 'Salvar' : 'Postar',
-              style: const TextStyle(
-                color: Color(0xFF7C3389),
-                fontWeight: FontWeight.bold,
-              ),
+          if (!_isLoading)
+            TextButton(
+              onPressed: _isSaving ? null : _submitForm,
+              child: _isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(
+                      _isEditing ? 'SALVAR' : 'POSTAR',
+                      style: const TextStyle(
+                        color: Color(0xFF7C3389),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
-          ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _tituloController,
-              decoration: const InputDecoration(
-                hintText: 'Título do post',
-                border: OutlineInputBorder(),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _tituloController,
+                    decoration: const InputDecoration(
+                      hintText: 'Título do post',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _conteudoController,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      hintText: 'Digite aqui...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _tagButton('Bug', CategoriaPost.Bug),
+                      _tagButton('Dúvida', CategoriaPost.Duvida),
+                      _tagButton('Resolução', CategoriaPost.Resolucao),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _conteudoController,
-              maxLines: 5,
-              decoration: const InputDecoration(
-                hintText: 'Digite aqui...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            // const SizedBox(height: 12),
-            // Row(
-            //   children: [
-            //     _tagButton('Bug', Colors.red, Colors.red, Colors.red),
-            //     _tagButton('Dúvida', Colors.orange, Colors.orange, Colors.orange),
-            //     _tagButton('Resolução', Colors.green, Colors.green, Colors.green),
-            //   ],
-            // ),
-          ],
-        ),
-      ),
     );
   }
 }
