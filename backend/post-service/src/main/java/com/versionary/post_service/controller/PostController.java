@@ -1,5 +1,6 @@
 package com.versionary.post_service.controller;
 
+import com.versionary.post_service.dto.PostCreatedDto;
 import com.versionary.post_service.dto.PostFeedDto;
 import com.versionary.post_service.model.Post;
 import com.versionary.post_service.service.PostService;
@@ -10,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,16 +27,17 @@ public class PostController {
     public PostController(PostService postService) {this.service = postService;}
 
     @PostMapping
-    public ResponseEntity<Post> create(@Valid @RequestBody Post post) {
-        System.out.println(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(post));
+    public ResponseEntity<Post> create(@Valid @RequestBody PostCreatedDto post, @AuthenticationPrincipal Jwt jwt) {
+
+//        logger.info("ID usuário = " + post.getUsuarioId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(post, jwt));
     }
 
     @GetMapping
     public ResponseEntity<Iterable<PostFeedDto>> getAll() {
-            logger.info("Início GET POSTS");
+
         Iterable<PostFeedDto> posts = service.getFeed();
-            logger.info("POSTS obtidos " + posts);
+
         return ResponseEntity.ok(posts);
     }
 
@@ -44,13 +48,13 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePost(@Valid @RequestBody Post newPost, @PathVariable Long id) {
-        service.update(id, newPost);
+    public ResponseEntity<Void> updatePost(@Valid @RequestBody Post newPost, @PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        service.update(id, newPost, jwt);
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        service.delete(id, jwt);
         return ResponseEntity.noContent().build();
     }
 
