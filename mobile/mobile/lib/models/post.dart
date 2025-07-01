@@ -20,10 +20,9 @@ class Post {
   DateTime? atualizado_em;
   DateTime? criado_em;
   Set<Comment>? comentarios = HashSet<Comment>();
-  Set<Like>? curtidas = HashSet<Like>();
   CategoriaPost? categoria;
 
-  Post(this.id, this.titulo, this.descricao, this.usuarioId, this.comentarios, this.curtidas);
+  Post(this.id, this.titulo, this.descricao, this.usuarioId, this.comentarios);
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
   Map<String, dynamic> toJson() => _$PostToJson(this);
 }
