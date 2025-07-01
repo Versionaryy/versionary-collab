@@ -37,14 +37,18 @@ jobs:
           echo "Nova API Config: ${CONFIG_ID}"
           
           echo  "Criação da configuração em si"
-          gcloud config configurations create ${CONFIG_ID} 
+            gcloud api-gateway api-configs create ${CONFIG_ID} \
+            --api=${{ secrets.API_ID }} \
+            --openapi-spec=./api-gateway-config/openapi-spec.yml \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+           
+
             # --api=${{ secrets.API_ID }} \
             # --openapi-spec=./api-gateway-config/openapi-spec.yml \
-            --project=${{ secrets.GCP_PROJECT_ID }}
-
+        
           echo "Atualização do Gateway para implementar nova configuração"
-          gcloud api-gateways update ${{ secrets.GATEWAY_ID}} \
+          gcloud api-gateway gateways update ${{ secrets.GATEWAY_ID}} \
             --api=${{ secrets.API_ID }} \
             --api-config=${CONFIG_ID} \
-            --location=${REGION} \
+            --location=${{env.REGION}} \
             --project=${{ secrets.GCP_PROJECT_ID }}

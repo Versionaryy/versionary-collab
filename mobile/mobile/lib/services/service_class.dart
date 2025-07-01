@@ -17,31 +17,50 @@ Future<Post> fetchPostById(int id) async {
   return Post.fromJson(body as Map<String, dynamic>);
 }
 
-Future<Post?> createPost(Post post) async {
-  final response = await http.post(
-    Uri.parse("$baseUrl/posts"),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode(post.toJson()),
+
+
+Future<void> deletePost(int postId) async {
+  final response = await http.delete(
+    Uri.parse("http://localhost:8089/posts/$postId"),
   );
-  if (response.statusCode == 201 || response.statusCode == 200) {
-    return Post.fromJson(jsonDecode(response.body));
+
+  if (response.statusCode != 204) {
+    throw Exception('Falha ao apagar o post.');
   }
-  return null;
 }
 
-Future<Post?> updatePost(int id, Post post) async {
+Future<void> updatePost(int postId, Post post) async {
   final response = await http.put(
-    Uri.parse("$baseUrl/posts/$id"),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode(post.toJson()),
+    Uri.parse("http://localhost:8089/posts/$postId"),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode({
+      'titulo': post.titulo,
+      'descricao': post.descricao,
+    }),
   );
-  if (response.statusCode == 200) {
-    return Post.fromJson(jsonDecode(response.body));
+
+  if (response.statusCode != 204) {
+    throw Exception('Falha ao atualizar o post.');
   }
-  return null;
 }
 
-Future<bool> deletePost(int id) async {
-  final response = await http.delete(Uri.parse("$baseUrl/posts/$id"));
-  return response.statusCode == 200 || response.statusCode == 204;
+
+Future<Post> createPost(Post post) async {
+  final response = await http.post(
+    Uri.parse("http://localhost:8089/posts"),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(post.toJson()), 
+  );
+
+  if (response.statusCode == 201) {
+    return Post.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Falha ao criar o post.');
+  }
 }
+
+
