@@ -15,6 +15,7 @@ Post _$PostFromJson(Map<String, dynamic> json) =>
         (json['comentarios'] as List<dynamic>?)
             ?.map((e) => Comment.fromJson(e as Map<String, dynamic>))
             .toSet(),
+        $enumDecodeNullable(_$CategoriaPostEnumMap, json['categoria']),
       )
       ..atualizado_em =
           json['atualizado_em'] == null
@@ -23,11 +24,7 @@ Post _$PostFromJson(Map<String, dynamic> json) =>
       ..criado_em =
           json['criado_em'] == null
               ? null
-              : DateTime.parse(json['criado_em'] as String)
-      ..categoria = $enumDecodeNullable(
-        _$CategoriaPostEnumMap,
-        json['categoria'],
-      );
+              : DateTime.parse(json['criado_em'] as String);
 
 Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{
   'id': instance.id,

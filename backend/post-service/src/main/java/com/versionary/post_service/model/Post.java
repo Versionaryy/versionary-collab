@@ -25,7 +25,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Enumerated(EnumType.STRING)
+
     @Column(name="categoria")
     private Categoria categoria;
 

@@ -11,6 +11,7 @@ import 'screens/tela_perfil.dart';
 import 'screens/tela_notificacoes.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   runApp(const VersionaryApp());
 }
@@ -21,8 +22,13 @@ class VersionaryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {    return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => DataClass()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProxyProvider<UserProvider, DataClass>(
+          create: (context) =>
+              DataClass(Provider.of<UserProvider>(context, listen: false).token),
+          update: (context, userProvider, previousDataClass) =>
+              previousDataClass!..updateToken(userProvider.token),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
