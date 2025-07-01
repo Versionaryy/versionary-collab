@@ -60,6 +60,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    @Transient
     public String getUsername() {
         return this.email;
     }

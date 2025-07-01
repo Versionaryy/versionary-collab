@@ -4,6 +4,7 @@ import com.versionary.post_service.model.Like;
 import com.versionary.post_service.model.Post;
 import com.versionary.post_service.repository.LikeRepository;
 import com.versionary.post_service.repository.PostRepository;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,8 @@ public class LikeService {
     }
 
     @Transactional
-    public void toggleLike(Long postId, Long userId) {
+    public void toggleLike(Long postId, Jwt jwt) {
+        long userId = Long.parseLong(jwt.getSubject());
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Publicação não encontrada com id: " + postId));
 
