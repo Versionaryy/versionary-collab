@@ -36,6 +36,7 @@ public class PostService {
         post.setTitulo(postDto.titulo());
         post.setDescricao(postDto.descricao());
         post.setUsuarioId(userId);
+        post.setCategoria(postDto.categoria());
         return repository.save(post);
     }
 
