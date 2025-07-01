@@ -5,6 +5,7 @@ import 'package:mobile/models/post.dart';
 import 'package:mobile/models/postFeed.dart';
 import 'package:mobile/services/data_class.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 
 
@@ -44,7 +45,7 @@ Color _corTag(CategoriaPost categoria) {
       case CategoriaPost.Duvida:
         return Colors.orange;
       case CategoriaPost.Resolucao:
-        return Colors.green;
+      return Colors.green;
     }
   }
 
@@ -52,17 +53,13 @@ Color _corTag(CategoriaPost categoria) {
   
   @override
   Widget build(BuildContext context) {
-    final posts = Provider.of<DataClass>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         toolbarHeight: 75,
-        title: Image.asset(
-          'assets/logo.png',
-          height: 80,
-        ),
+        title: Image.asset('assets/logo.png', height: 80),
         centerTitle: true,
         actions: [
           IconButton(
@@ -73,18 +70,24 @@ Color _corTag(CategoriaPost categoria) {
           ),
         ],
       ),
-      body:  
-      posts.posts == null
-          ? const Center(child: CircularProgressIndicator())
-          : posts.posts!.isEmpty
-              ? const Center(child: Text('Nenhum post encontrado'))
-              :
-      ListView.builder(
-        itemBuilder: (context, index) {
-          final post = posts.posts?[index];
-          return postCard(context, post!);
+      body: Consumer<DataClass>(
+        builder: (context, data, child) {
+          if (data.isLoading && data.posts == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (data.posts == null || data.posts!.isEmpty) {
+            return const Center(child: Text('Nenhum post encontrado.'));
+          }
+
+          return ListView.builder(
+            itemCount: data.posts!.length,
+            itemBuilder: (context, index) {
+              final post = data.posts![index];
+              return postCard(context, post);
+            },
+          );
         },
-        itemCount: posts.posts?.length ?? 0,
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -161,11 +164,35 @@ Color _corTag(CategoriaPost categoria) {
                   ),
                   const Spacer(),
                   PopupMenuButton<String>(
-                    onSelected: (String value) {
-                      if (value == 'editar') {
-                        print('Editar post: ');
-                      } else if (value == 'apagar') {
-                        print('Apagar post:');
+                    onSelected: (String value) async {
+                      if (value == 'apagar') {
+                        final bool? confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Confirmar Exclusão'),
+                              content: const Text(
+                                  'Você tem certeza que deseja apagar este post? Esta ação não pode ser desfeita.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: const Text('Apagar', style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (confirmed == true && mounted) {
+                          Provider.of<DataClass>(context, listen: false).removePost(post.id!);
+                        }
+                      } else if (value == 'editar') {
+                        // Navega para a tela de edição passando apenas o ID do post.
+                        Navigator.pushNamed(context, '/criarpost', arguments: post.id);
                       }
                     },
                     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -222,8 +249,13 @@ Color _corTag(CategoriaPost categoria) {
                     },
                     child: const Text('Comentar'),
                   ),
-                  //const Spacer(),
-                  //const Icon(Icons.share, size: 18),
+                   const Spacer(),
+                IconButton(
+                  icon: Icon(Icons.share),
+                  onPressed: () {
+                    Share.share('${post.titulo}\n\n${post.descricao}');
+                    }
+                  )
                 ],
               )
             ],

@@ -251,7 +251,6 @@ class _LoginPageState extends State<LoginPage> {
       await Provider.of<UserProvider>(context, listen: false)
           .login(_emailController.text, _passwordController.text);
 
-      // Verifica se o widget ainda está na árvore de widgets antes de navegar
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/feed');
       }
