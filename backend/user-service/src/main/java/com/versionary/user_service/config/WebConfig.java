@@ -1,4 +1,4 @@
-package com.versionary.post_service.config;
+package com.versionary.user_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +10,6 @@ import java.util.List;
 
 @Configuration
 public class WebConfig {
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
