@@ -11,6 +11,7 @@ jobs:
   deploy-services:
     name: Deploy dos microsserviços
     runs-on: ubuntu-latest
+    environment: environment
     
     permissions:
       contents: 'read'
@@ -35,18 +36,16 @@ jobs:
       - name: 'Autenticação Google Cloud'
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_SA_EMAIL }}
+          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
 
       - name: 'Buildx Docker'
         uses: docker/setup-buildx-action@v3
-
       - name: 'Build e push da imagem'
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.build-context }} 
           push: true
-          tags: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
+          tags: ${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -54,6 +53,6 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           service: ${{ matrix.service-name }} 
-          region: ${{ env.REGION }} 
-          image: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
+          region: ${{ vars.REGION }} 
+          image: ${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
           flags: '--allow-unauthenticated'
