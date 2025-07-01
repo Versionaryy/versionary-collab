@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/models/post.dart';
 import 'package:mobile/services/data_class.dart';
 import 'package:provider/provider.dart';
-
-
+import 'package:share_plus/share_plus.dart';
 
 class TelaFeed extends StatefulWidget {
 
@@ -58,10 +57,9 @@ class _TelaFeedState extends State<TelaFeed> {
               :
       ListView.builder(
         itemBuilder: (context, index) {
-          final post = posts.posts?[index];
+          final post = posts.posts![index];
           final username = 'Usuário';
-          final content = post?.titulo ?? '';
-          return postCard(context, username, content);
+          return postCard(context, username, post);
         },
         itemCount: posts.posts?.length ?? 0,
       ),
@@ -98,7 +96,10 @@ class _TelaFeedState extends State<TelaFeed> {
     );
   }
 
-  Widget postCard(BuildContext context, String username, String content /*,{required String postId}*/) {
+  Widget postCard(BuildContext context, String username, Post post) {
+    final String content = post.descricao ?? 'Sem descrição';
+    final String title = post.titulo ?? 'Sem Título';
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -126,17 +127,36 @@ class _TelaFeedState extends State<TelaFeed> {
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 14),
                     ),
-                    const Text('15 hours ago',
-                        style: TextStyle(fontSize: 12)),
+                    const Text(
+                      '15 hours ago',
+                      style: TextStyle(fontSize: 12)),
                   ],
                 ),
                 const Spacer(),
                 PopupMenuButton<String>(
-                  onSelected: (String value) {
+                  onSelected: (String value) async { 
                     if (value == 'editar') {
-                      print('Editar post: ');
+                        Navigator.pushNamed(
+                        context,
+                        '/criarpost',
+                        arguments: post,
+                      );
                     } else if (value == 'apagar') {
-                      print('Apagar post:');
+                      try {
+                        await Provider.of<DataClass>(context, listen: false).removePost(post.id!);
+                        
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Post apagado com sucesso!'), backgroundColor: Colors.green),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Erro ao apagar o post.'), backgroundColor: Colors.red),
+                          );
+                        }
+                      }
                     }
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -160,17 +180,17 @@ class _TelaFeedState extends State<TelaFeed> {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'Dúvida',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            //   decoration: BoxDecoration(
+            //     color: Colors.orange,
+            //     borderRadius: BorderRadius.circular(8),
+            //   ),
+            //   child: const Text(
+            //     'Dúvida',
+            //     style: TextStyle(color: Colors.white, fontSize: 12),
+            //   ),
+            // ),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -184,15 +204,20 @@ class _TelaFeedState extends State<TelaFeed> {
                       arguments: {
                         'username': username,
                         'conteudo': content,
-                        'tag': 'Dúvida',
+                        // 'tag': 'Dúvida',
                         // 'postId': '',
                       },
                     );
                   },
                   child: const Text('Comentar'),
                 ),
-                //const Spacer(),
-                //const Icon(Icons.share, size: 18),
+                const Spacer(),
+                IconButton(
+                  icon: Icon(Icons.share),
+                  onPressed: () {
+                    Share.share('${post.titulo}\n\n${post.descricao}');
+                    }
+                  )
               ],
             )
           ],
