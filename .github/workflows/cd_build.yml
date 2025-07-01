@@ -6,7 +6,7 @@ on:
 
 env:
   GAR_REPOSITORY: "versionary-collab" 
-
+  REGION: "southamerica-east1"
 jobs:
   deploy-services:
     name: Deploy dos microsserviços
@@ -46,7 +46,7 @@ jobs:
           context: ${{ matrix.build-context }} 
           push: true
           run: echo "${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}"
-          tags: ${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
+          tags: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -54,6 +54,6 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           service: ${{ matrix.service-name }} 
-          region: ${{ vars.REGION }} 
-          image: ${{ vars.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
+          region: ${{ env.REGION }} 
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
           flags: '--allow-unauthenticated'
