@@ -15,7 +15,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("API do Serviço de Posts (post-service)")
                         .version("v1")
-                        .description("API responsável pelo gerenciamento de posts, comentários e likes da plataforma Versionary Collab.")
+                        .description("API responsável pelo gerenciamento de posts e da plataforma Versionary Collab.")
                         .termsOfService("http://swagger.io/terms/")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }

@@ -1,13 +1,23 @@
 import 'dart:convert';
-
 import 'package:mobile/models/post.dart';
 import 'package:http/http.dart' as http;
+import 'package:mobile/models/postFeed.dart';
 
-Future<List<Post>> fetchPosts() async {
-  final response = await http.get(Uri.parse("http://localhost:8089/posts"));
+const String baseUrl = "http://localhost:8089";
+
+Future<List<PostFeed>> fetchPosts() async {
+  final response = await http.get(Uri.parse("$baseUrl/posts"));
   final List<dynamic> posts = jsonDecode(response.body);
-  return posts.map((post) => Post.fromJson(post as Map<String, dynamic>)).toList();
+  return posts.map((post) => PostFeed.fromJson(post as Map<String, dynamic>)).toList();
 }
+
+Future<Post> fetchPostById(int id) async {
+  final response = await http.get(Uri.parse("$baseUrl/posts/$id"));
+  final body = jsonDecode(response.body);
+  return Post.fromJson(body as Map<String, dynamic>);
+}
+
+
 
 Future<void> deletePost(int postId) async {
   final response = await http.delete(
@@ -52,3 +62,5 @@ Future<Post> createPost(Post post) async {
     throw Exception('Falha ao criar o post.');
   }
 }
+
+

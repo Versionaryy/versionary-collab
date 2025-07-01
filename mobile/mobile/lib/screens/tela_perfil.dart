@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/main.dart';
+import 'package:provider/provider.dart';
 
 class TelaPerfil extends StatelessWidget {
   static const Color roxo = Color(0xFF7C3389);
@@ -59,8 +61,10 @@ class TelaPerfil extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(
-                  onPressed: () {
+                  onPressed: () async{
                     // sair
+                    await Provider.of<UserProvider>(context, listen: false).clearToken();
+                    Navigator.of(context).pushNamedAndRemoveUntil("/login", (Route<dynamic> route) => false);
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),

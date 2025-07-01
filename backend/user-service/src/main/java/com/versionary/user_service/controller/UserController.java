@@ -31,4 +31,11 @@ public class UserController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editProfile(@RequestBody RegisterRequestDto editRequestDto) {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
+
 }

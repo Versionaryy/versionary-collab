@@ -44,9 +44,8 @@ class _TelaCriarPostState extends State<TelaCriarPost> {
         postParaEditar!.id,
         _tituloController.text,
         _conteudoController.text,
-        postParaEditar!.usuario_id,
+        postParaEditar!.usuarioId,
         postParaEditar!.comentarios,
-        postParaEditar!.curtidas,
       );
 
       try {

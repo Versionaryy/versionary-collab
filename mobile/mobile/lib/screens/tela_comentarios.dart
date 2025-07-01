@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/models/post.dart';
 
 class Comentario {
   final String username;
@@ -18,7 +19,8 @@ class ComentarioItem extends StatelessWidget {
   const ComentarioItem({super.key, required this.comentario});
 
   String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
+    timestamp = timestamp.toLocal();
+    final now = DateTime.now().toLocal();
     final difference = now.difference(timestamp);
 
     if (difference.inDays > 0) {
@@ -74,16 +76,11 @@ class ComentarioItem extends StatelessWidget {
 }
 
 class TelaComentarios extends StatefulWidget {
-  final String username;
-  final String conteudo;
-  final String tag;
-  final String postId;
+
+  final int postId;
 
   const TelaComentarios({
     super.key,
-    required this.username,
-    required this.conteudo,
-    required this.tag,
     required this.postId,
   });
 
@@ -95,19 +92,16 @@ class _TelaComentariosState extends State<TelaComentarios> {
   final TextEditingController _comentarioController = TextEditingController();
   final List<Comentario> _comentarios = [];
 
-  Color _corTag(String tag) {
-    switch (tag) {
-      case 'Bug':
+  Color _corTag(CategoriaPost categoria) {
+    switch (categoria) {
+      case CategoriaPost.Bug:
         return Colors.red;
-      case 'Dúvida':
+      case CategoriaPost.Duvida:
         return Colors.orange;
-      case 'Resolução':
+      case CategoriaPost.Resolucao:
         return Colors.green;
-      default:
-        return Colors.grey;
     }
   }
-
    void _addComentario() {
     if (_comentarioController.text.isNotEmpty) {
       setState(() {
@@ -134,7 +128,7 @@ class _TelaComentariosState extends State<TelaComentarios> {
 
   @override
   Widget build(BuildContext context) {
-    final corTag = _corTag(widget.tag);
+    var corTag = _corTag(CategoriaPost.Duvida); 
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -164,7 +158,8 @@ class _TelaComentariosState extends State<TelaComentarios> {
                 CircleAvatar(
                   backgroundColor: const Color(0xFF7C3389),
                   child: Text(
-                    widget.username[0].toUpperCase(),
+                    // widget.username[0].toUpperCase(),
+                    "a",
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -173,7 +168,8 @@ class _TelaComentariosState extends State<TelaComentarios> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.username,
+                      // widget.username,
+                      'a',
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 14),
                     ),
@@ -187,14 +183,14 @@ class _TelaComentariosState extends State<TelaComentarios> {
                 PopupMenuButton<String>(
                   onSelected: (String value) {
                     if (value == 'editar') {
-                      print('Editar post: ${widget.postId}');
+                      print('Editar post:');
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Ação: Editar Post ${widget.postId}')),
+                        SnackBar(content: Text('Ação: Editar Post')),
                       );
                     } else if (value == 'apagar') {
-                      print('Apagar post: ${widget.postId}');
+                      print('Apagar post:');
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Ação: Apagar Post ${widget.postId}')),
+                        SnackBar(content: Text('Ação: Apagar Post ')),
                       );
                     }
                   },
@@ -215,18 +211,20 @@ class _TelaComentariosState extends State<TelaComentarios> {
             ),
             const SizedBox(height: 12),
             Text(
-              widget.conteudo,
+              // widget.conteudo,
+              'a',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: corTag,
+                // color: corTag,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                widget.tag,
+                // widget.tag,
+                'Dúvida',
                 style: const TextStyle(color: Colors.white, fontSize: 12),
               ),
             ),
