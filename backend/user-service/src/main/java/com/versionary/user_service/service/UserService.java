@@ -1,5 +1,6 @@
 package com.versionary.user_service.service;
 import com.versionary.user_service.dto.RegisterRequestDto;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.versionary.user_service.model.User;
@@ -22,7 +23,10 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public User getByUser(String username) {
 
+         return repository.findByUsuario(username).orElseThrow(() -> new IllegalStateException("Usuário não existe"));
+    }
 
     @Transactional
     public User register(RegisterRequestDto registerRequest) {
@@ -41,5 +45,23 @@ public class UserService {
         newUser.setSenha(passwordEncoder.encode(registerRequest.senha()));
 
         return repository.save(newUser);
+    }
+
+
+    @Transactional
+    public void update(Long id, RegisterRequestDto newUser, Jwt jwt) {
+
+        long userId = Long.parseLong(jwt.getSubject());
+
+        User prevUser = repository.findByUsuario(newUser.usuario()).orElseThrow(() -> new IllegalStateException("Usuário não encontrado"));
+        if(prevUser.getId() != userId) {
+            throw new SecurityException("Você não tem permissão para editar este usuário");
+        }
+
+        prevUser.setNome(newUser.nome());
+        prevUser.setUsuario(newUser.usuario());
+        prevUser.setEmail(newUser.email());
+        prevUser.setSenha(newUser.senha());
+        repository.save(prevUser);
     }
 }
