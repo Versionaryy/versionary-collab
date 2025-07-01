@@ -138,16 +138,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  Text(
-                    'Esqueceu sua senha?',
-                    style: TextStyle(
-                      color: roxo,
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/feed');

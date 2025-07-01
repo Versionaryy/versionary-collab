@@ -8,9 +8,48 @@ class DataClass extends ChangeNotifier{
 
   getPosts() async {
     isLoading = true;
-    notifyListeners();
     posts = (await fetchPosts());
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> removePost(int postId) async {
+    try {
+      await deletePost(postId);
+      
+      posts?.removeWhere((post) => post.id == postId);
+      notifyListeners();
+    } catch (e) {
+      print('Erro ao apagar o post: $e');
+
+      throw Exception('Falha ao apagar o post.');
+    }
+  }
+
+  Future<void> editPost(int postId, Post updatedPost) async {
+    try {
+
+      await updatePost(postId, updatedPost);
+
+      final index = posts?.indexWhere((post) => post.id == postId);
+      if (index != null && index != -1) {
+        posts?[index] = updatedPost;
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Erro ao editar o post: $e');
+
+      throw Exception('Falha ao editar o post.');
+    }
+  }
+
+  Future<void> createPostService(Post post) async {
+    try {
+      await createPost(post); 
+      await getPosts(); 
+    } catch (e) {
+      print('Erro ao criar o post: $e');
+      throw Exception('Falha ao criar o post.');
+    }
   }
 }
