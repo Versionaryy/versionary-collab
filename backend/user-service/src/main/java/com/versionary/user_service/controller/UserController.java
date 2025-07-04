@@ -2,6 +2,7 @@ package com.versionary.user_service.controller;
 
 import com.versionary.user_service.dto.RegisterRequestDto;
 import com.versionary.user_service.dto.RegisterResponseDto;
+import com.versionary.user_service.dto.UserSummaryDto;
 import com.versionary.user_service.model.User;
 import com.versionary.user_service.service.UserService;
 import jakarta.validation.Valid;
@@ -30,5 +31,19 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editProfile(@RequestBody RegisterRequestDto editRequestDto) {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserSummaryDto> getPost(@PathVariable Long id) {
+        User user = service.getById(id);
+        UserSummaryDto userSummaryDto = new UserSummaryDto(user.getId(), user.getUsuario());
+        return ResponseEntity.ok(userSummaryDto);
+    }
+
+
 
 }

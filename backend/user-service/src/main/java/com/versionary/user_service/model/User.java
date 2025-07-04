@@ -45,6 +45,7 @@ public class User implements UserDetails {
     @Column(name="senha")
     private String senha;
 
+
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
     private LocalDateTime criado_em = LocalDateTime.now();
@@ -60,6 +61,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    @Transient
     public String getUsername() {
         return this.email;
     }

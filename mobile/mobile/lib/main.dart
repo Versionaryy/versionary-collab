@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:mobile/services/data_class.dart';
+import 'package:mobile/services/user_service.dart';
 import 'package:provider/provider.dart';
-import 'routes/tela_cadastro.dart';
-import 'routes/tela_feed.dart';
-import 'routes/tela_criarpost.dart';
-import 'routes/tela_comentarios.dart';
-import 'routes/tela_perfil.dart';
-import 'routes/tela_notificacoes.dart';
+import 'screens/tela_cadastro.dart';
+import 'screens/tela_feed.dart';
+import 'screens/tela_criarpost.dart';
+import 'screens/tela_comentarios.dart';
+import 'screens/tela_perfil.dart';
+import 'screens/tela_notificacoes.dart';
 
-void main() => runApp(VersionaryApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+  runApp(const VersionaryApp());
+}
 
 class VersionaryApp extends StatelessWidget {
   const VersionaryApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider( 
-      create: (context) => DataClass(),
+  Widget build(BuildContext context) {    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProxyProvider<UserProvider, DataClass>(
+          create: (context) =>
+              DataClass(Provider.of<UserProvider>(context, listen: false).token),
+          update: (context, userProvider, previousDataClass) =>
+              previousDataClass!..updateToken(userProvider.token),
+        ),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         initialRoute: '/login',
@@ -30,13 +43,10 @@ class VersionaryApp extends StatelessWidget {
         },
         onGenerateRoute: (settings) {
           if (settings.name == '/comentarios') {
-            final args = settings.arguments as Map<String, String>;
+            final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
               builder: (context) => TelaComentarios(
-                username: args['username']!,
-                conteudo: args['conteudo']!,
-                tag: args['tag']!,
-                postId: args['postId']!,
+                postId: args['postId'] as int,
               ),
             );
           }
@@ -47,11 +57,61 @@ class VersionaryApp extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
-  final Color roxo = const Color(0xFF7C3389);
-  final Color fundoLogin = const Color(0xFFCFB4D3);
+class UserProvider extends ChangeNotifier {
+  UserProvider() {
+    _loadTokenFromStorage();
+  }
+
+  String? _token;
+
+  String? get token => _token;
+
+  void _loadTokenFromStorage() {
+    _token = GetStorage().read('token');
+    notifyListeners();
+  }
+
+  Future<void> login(String email, String password) async {
+    final response = await loginAPI(email, password);
+    setToken(response.token);
+  }
+
+  Future<void> setToken(String token) async {
+    _token = token;
+    await GetStorage().write('token', token);
+    notifyListeners();
+  }
+
+  Future<void> clearToken() async {
+    _token = null;
+    await GetStorage().remove('token');
+    notifyListeners();
+  }
+}
+
+class LoginPage extends StatefulWidget {
 
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  final Color roxo = const Color(0xFF7C3389);
+
+  final Color fundoLogin = const Color(0xFFCFB4D3);
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +144,6 @@ class LoginPage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
-            // Card de login
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               padding: const EdgeInsets.all(24),
@@ -112,6 +171,7 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   TextField(
+                    controller: _emailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
                       filled: true,
@@ -125,6 +185,7 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   TextField(
+                    controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: 'Senha',
@@ -138,20 +199,8 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  Text(
-                    'Esqueceu sua senha?',
-                    style: TextStyle(
-                      color: roxo,
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/feed');
-                    },
+                    onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: roxo,
                       shape: RoundedRectangleBorder(
@@ -159,13 +208,22 @@ class LoginPage extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text(
-                      'Entrar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Entrar',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                 ],
               ),
@@ -188,5 +246,32 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await Provider.of<UserProvider>(context, listen: false)
+          .login(_emailController.text, _passwordController.text);
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/feed');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Falha no login: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }

@@ -24,6 +24,11 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+
+    @Column(name="categoria")
+    private Categoria categoria;
+
     @NotBlank
     @Column(name = "titulo")
     private String titulo;
@@ -39,9 +44,6 @@ public class Post {
     @JsonManagedReference("post-comentarios")
     private Set<Comment> comentarios = new HashSet<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference("post-curtidas")
-    private Set<Like> curtidas = new HashSet<>();
 
 
 
@@ -59,13 +61,13 @@ public class Post {
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }
     public long getUsuarioId() { return usuario_id; }
-    public void setUsuarioId(long usuario_id) { this.usuario_id = Post.this.usuario_id; }
-    public Set<Like> getCurtidas() { return curtidas; }
-    public void setCurtidas(Set<Like> curtidas) { this.curtidas = curtidas; }
+    public void setUsuarioId(long usuario_id) { this.usuario_id = usuario_id; }
     public Set<Comment> getComentarios() { return comentarios; }
     public void setComentarios(Set<Comment> comentarios) { this.comentarios = comentarios; }
     public LocalDateTime setCriado_em() { return criado_em; }
-    public void setCriado_em(LocalDateTime criado_em) { this.criado_em = Post.this.criado_em; }
+    public void setCriado_em(LocalDateTime criado_em) { this.criado_em = criado_em; }
     public LocalDateTime getAtualizado_em() { return atualizado_em; }
-    public void setAtualizado_em(LocalDateTime atualizado_em) { this.atualizado_em = Post.this.atualizado_em; }
+    public void setAtualizado_em(LocalDateTime atualizado_em) { this.atualizado_em = atualizado_em; }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 }
