@@ -38,18 +38,19 @@ jobs:
         with:
           credentials_json: ${{ secrets.CREDENTIALS_JSON }}
 
+      - name: 'Ativar BuildKit (garante push monolítico)'
+        run: echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV
+
       - name: 'Buildx Docker'
         uses: docker/setup-buildx-action@v3
-      - name: 'Build e push da imagem'
+
+      - name: 'Build e push da imagem (monolítico)'
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.build-context }} 
+          context: ${{ matrix.build-context }}
           push: true
-
           tags: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.service-name }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
+          provenance: false
       - name: 'Deploy'
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
