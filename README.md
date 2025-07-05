@@ -1,5 +1,10 @@
 # Versionary Collab
-Rede social do jogo Versionary
+Rede social do jogo Versionary.
+
+Resultado do aplicativo: 
+
+https://github.com/user-attachments/assets/739692b5-fa0e-4c86-a95d-3cece0f9ffb3
+
 
 ## Usuários 
  
