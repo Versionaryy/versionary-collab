@@ -1,4 +1,4 @@
-openapi: 2.0.0
+swagger: "2.0"
 info:
   title: Versionary Collab API
   version: 1.0.0
