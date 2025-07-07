@@ -6,6 +6,7 @@ paths:
   /users:
     post:
       summary: Cadastro de usuário
+      operationId: createUser
       parameters:
         - in: body
           name: body
